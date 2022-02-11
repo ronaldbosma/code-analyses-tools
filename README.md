@@ -8,6 +8,10 @@ These are some handy tools and scripts I've used in the past to perform code ana
 
 Can split a file in multiple smaller files. For instance it can split a large .sql file in smaller ones, splitting on the keyword `GO`.
 
+## PowerShell
+
+Folder with a few handy PowerShell scripts. See the top comments in the scripts for more details.
+
 ## Solution Project Checker
 
 Has features
