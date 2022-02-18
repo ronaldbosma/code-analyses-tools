@@ -12,6 +12,11 @@ Can split a file in multiple smaller files. For instance it can split a large .s
 
 Folder with a few handy PowerShell scripts. See the top comments in the scripts for more details.
 
+## SQL
+
+Folder with Scripts:
+- DependencyAnalysis: scripts to perform a dependency analysis between stored procedures and tables.
+
 ## Solution Project Checker
 
 Has features
