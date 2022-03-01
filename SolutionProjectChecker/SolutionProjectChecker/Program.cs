@@ -2,4 +2,5 @@
 using SolutionProjectChecker;
 
 //CheckProjectUsage.Run();
-TargetFrameworkCounter.Run();
+//TargetFrameworkCounter.Run();
+PackageReferenceLister.Run();
