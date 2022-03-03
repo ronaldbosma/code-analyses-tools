@@ -11,7 +11,7 @@ namespace SolutionProjectChecker
         public static void Run()
         {
             const string rootFolder = @"C:\repos\foo";
-            const string outputFileAllPackageReferences = @"C:\repos\foo\package -references-all.csv";
+            const string outputFileAllPackageReferences = @"C:\repos\foo\package-references-all.csv";
             const string outputFileUniquePackageReferences = @"C:\repos\foo\package-references-unique.csv";
 
             Regex packageReferencePattern = new Regex(@"<PackageReference Include=""([A-Za-z0-9\.-]+)"" Version=""([A-Za-z0-9\.-]+)"" />");
