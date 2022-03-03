@@ -58,16 +58,19 @@ namespace SolutionProjectChecker
             using (var writer = new StreamWriter(outputFileUniquePackageReferences))
             {
                 var uniquePackageReferences = (from pr in packageReferences
-                                               orderby pr.Package.Id, pr.Package.Version
-                                               select pr.Package
+                                               group pr by pr.Package into package
+                                               orderby package.Key.Id, package.Key.Version
+                                               select package
                                               )
                                               .Distinct();
 
-                writer.WriteLine("Package Id;Package Version");
+                writer.WriteLine("Package Id;Package Version;Number of Occurrences");
                 foreach (var item in uniquePackageReferences)
                 {
-                    Console.WriteLine($"{item.Id} - {item.Version}");
-                    writer.WriteLine($"{item.Id}; {item.Version}");
+                    var package = item.Key;
+
+                    Console.WriteLine($"{package.Id} - {package.Version} ({item.Count()})");
+                    writer.WriteLine($"{package.Id}; {package.Version}; {item.Count()}");
                 }
             }
         }
