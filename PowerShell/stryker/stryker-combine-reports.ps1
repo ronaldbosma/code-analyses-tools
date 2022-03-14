@@ -37,7 +37,7 @@ Write-Verbose "- rootFolder: $rootFolder"
 Write-Verbose "- mutationReportTemplateFilePath: $mutationReportTemplateFilePath"
 
 
-$combinedReportHtmlFile = Join-Path $rootFolder "StrykerOutput" "combined-mutation-report.html"
+$combinedReportHtmlFile = Join-Path $rootFolder "combined-mutation-report.html"
 $combinedReport = $null
 
 
