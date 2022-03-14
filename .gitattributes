@@ -1,0 +1,2 @@
+# Do not modify line endings for HTML files, because it will break the Stryker HTML report template.
+*.html -crlf
