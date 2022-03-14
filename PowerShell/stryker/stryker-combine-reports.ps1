@@ -1,19 +1,19 @@
 <#
 	.SYNOPSIS
-        Combines Stryker reports.
+		Combines Stryker reports.
+
+	.DESCRIPTION
+		Looks for `mutation-report.json` files in the specified root folder and merges them into a single HTML report.
 		
-    .DESCRIPTION
-        Looks for `mutation-report.json` files in the specified root folder and merges them into a single HTML report.
-			
 	.PARAMETER rootFolder
 		The root folder in which to look for `mutation-report.json` files.
-		
+
 	.PARAMETER mutationReportTemplateFilePath
 		Path to the HTML report template.
-		
+
 	.EXAMPLE
 		.\stryker-combine-reports.ps1 "C:\temp\my-repo" "C:\temp\stryker-mutation-report-template.html"
-		
+
 	.NOTES
 		Requires PowerShell Core 7 or newer. We need the -EscapeHandling parameter on ConvertTo-Json to escape HTML-specific characters in the json.
 #>
@@ -77,6 +77,6 @@ else
 	$html = $reportTemplate.Replace("##REPORT_JSON##", $json)
 	
 	Write-Host "Generate combined HTML report: $combinedReportHtmlFile"
-    Set-Content -Path $combinedReportHtmlFile -Value $html -Force
+	Set-Content -Path $combinedReportHtmlFile -Value $html -Force
 }
 
