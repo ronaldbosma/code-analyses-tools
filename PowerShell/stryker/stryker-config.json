@@ -1,0 +1,7 @@
+{
+    "stryker-config":
+    {
+        "ignore-methods": ["ConfigureAwait"],
+        "reporters": ["html", "json", "progress"]
+    }
+}
