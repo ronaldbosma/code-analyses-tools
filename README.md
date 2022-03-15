@@ -36,4 +36,4 @@ It will:
 - Add the project folder to the file paths in the report so the report is grouped per project/folder.
 - Combine the merged reports of the different project roots into one report.
 - Export the combined report as a JSON.
-- Add the JSON to an HTML report template, resulting in the HTML report.
+- Add the JSON to an [HTML report template](./PowerShell/stryker/stryker-mutation-report-template.html), resulting in the HTML report.
