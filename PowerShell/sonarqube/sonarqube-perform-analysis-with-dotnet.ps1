@@ -2,7 +2,7 @@
 	.SYNOPSIS
         Analyse .NET (Core) solution with SonarQube
 		
-    .DESCRIPTION
+	.DESCRIPTION
         Performs an analysis of a solution with SonarQube.
 		It will:
 			- step into the solution folder
@@ -23,7 +23,7 @@
 		The token to use when connecting to SonarQube.
 		
 	.EXAMPLE
-		.\perform-analysis.ps1 "C:\temp\my-solution.sln" "http://localhost:9000" "*****"
+		.\perform-sonarqube-analysis-with-dotnet.ps1 "C:\temp\my-solution.sln" "http://localhost:9000" "*****"
 		
 	.NOTES
 		Requires dotnet-sonarscanner to be installed as global dotnet tool.
