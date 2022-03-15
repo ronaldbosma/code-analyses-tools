@@ -23,3 +23,17 @@ Has features
 1. Checking which project files in a certain folder are not linked in a specific solution file.
 1. Extracting the target frameworks of each project in a folder (and subfolders), and writing the result to a CSV.
 1. Extracting the package references of each project in a folder (and subfolders), and writing the result to a CSV. Will also list all unique combinations of package id and version in a separate CSV.
+
+## StrykerReportMerger
+
+Can merge multiple Stryker JSON report files (mutation-report.json). 
+It will:
+- Look for all `mutation-report.json` in a specified folder and subfolders.
+- Merge the reports that have the same project root.
+  This can be the case if you have different test projects that test the same project. 
+  It will look for the same files and merge the mutants by taking the mutant with the best status. 
+  E.g. `Killed` takes precedence over `Surived`, `Survived` over `NoCoverage`, etc.
+- Add the project folder to the file paths in the report so the report is grouped per project/folder.
+- Combine the merged reports of the different project roots into one report.
+- Export the combined report as a JSON.
+- Add the JSON to an HTML report template, resulting in the HTML report.
