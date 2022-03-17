@@ -12,9 +12,13 @@ namespace SolutionProjectChecker
         private const string outputFileAllPackageReferences = @$"{rootFolder}\package-references-all.csv";
         private const string outputFileUniquePackageReferences = @$"{rootFolder}\package-references-unique.csv";
 
-        private static readonly Regex packageReferencePattern = new Regex(@"<PackageReference Include=""([A-Za-z0-9\.-]+)"" Version=""([A-Za-z0-9\.-]+)"" />");
-        private static readonly Regex packagesConfigIdPattern = new Regex(@"id=""([A-Za-z0-9\.-]+)""");
-        private static readonly Regex packagesConfigVersionPattern = new Regex(@"version=""([A-Za-z0-9\.-]+)""");
+        // Patterns in *.csproj
+        private static readonly Regex packageReferencePattern1 = new (@"<PackageReference Include=""([A-Za-z0-9\.-]+)"" Version=""([A-Za-z0-9\.-]+)"" />");
+        private static readonly Regex packageReferencePattern2 = new(@"<PackageReference Include=""([A-Za-z0-9\.-]+)"">[ \n\r]*<Version>([A-Za-z0-9\.-]+)</Version>[ \n\r]*</PackageReference>");
+
+        // Patterns in packages.config
+        private static readonly Regex packagesConfigIdPattern = new (@"id=""([A-Za-z0-9\.-]+)""");
+        private static readonly Regex packagesConfigVersionPattern = new (@"version=""([A-Za-z0-9\.-]+)""");
 
         private readonly record struct PackageReference(string SourceFile, Package Package);
         private readonly record struct Package(string Id, string Version);
@@ -42,19 +46,29 @@ namespace SolutionProjectChecker
 
             using (var reader = new StreamReader(projFile))
             {
-                var line = reader.ReadLine();
-                while (line != null)
-                {
-                    var match = packageReferencePattern.Match(line);
+                var content = reader.ReadToEnd();
+                packageReferences.AddRange(GetPackageReferencesUsingRegex(projFile, content, packageReferencePattern1));
+                packageReferences.AddRange(GetPackageReferencesUsingRegex(projFile, content, packageReferencePattern2));
+            }
 
+            return packageReferences;
+        }
+
+        private static IEnumerable<PackageReference> GetPackageReferencesUsingRegex(string projFile, string content, Regex regex)
+        {
+            var packageReferences = new List<PackageReference>();
+            
+            var matches = regex.Matches(content);
+            if (matches != null)
+            {
+                foreach (var match in matches.ToList())
+                {
                     if (match.Success && match.Groups.Count > 2)
                     {
                         var packageId = match.Groups[1].Value;
                         var packageVersion = match.Groups[2].Value;
                         packageReferences.Add(new PackageReference(projFile, new Package(packageId, packageVersion)));
                     }
-
-                    line = reader.ReadLine();
                 }
             }
 
