@@ -74,16 +74,16 @@ namespace SolutionProjectChecker
                     while (line != null)
                     {
                         var matchId = packagesConfigIdPattern.Match(line);
-                        var matchVerson = packagesConfigVersionPattern.Match(line);
+                        var matchVersion = packagesConfigVersionPattern.Match(line);
 
                         if (matchId.Success && matchId.Groups.Count > 1)
                         {
                             var packageId = matchId.Groups[1].Value;
                             var packageVersion = "";
 
-                            if (matchVerson.Success && matchVerson.Groups.Count > 1)
+                            if (matchVersion.Success && matchVersion.Groups.Count > 1)
                             {
-                                packageVersion = matchVerson.Groups[2].Value;
+                                packageVersion = matchVersion.Groups[1].Value;
                             }
 
                             packageReferences.Add(new PackageReference(packagesConfigPath, new Package(packageId, packageVersion)));
