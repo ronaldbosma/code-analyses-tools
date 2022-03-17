@@ -22,7 +22,10 @@ Folder with Scripts:
 Has features
 1. Checking which project files in a certain folder are not linked in a specific solution file.
 1. Extracting the target frameworks of each project in a folder (and subfolders), and writing the result to a CSV.
-1. Extracting the package references of each project in a folder (and subfolders), and writing the result to a CSV. Will also list all unique combinations of package id and version in a separate CSV.
+1. Extracting the package references of each project in a folder (and subfolders), and writing the result to a CSV. 
+   - Will look for `PackageReference` elements in a `(*.csproj|*.vbproj)` file. Can handle package references with the version as an attribute and as an element.
+   - Will look for packages in `package.config` files that are in the same folder as a `(*.csproj|*.vbproj)`
+   - Will also list all unique combinations of package id and version in a separate CSV.
 
 ## StrykerReportMerger
 
