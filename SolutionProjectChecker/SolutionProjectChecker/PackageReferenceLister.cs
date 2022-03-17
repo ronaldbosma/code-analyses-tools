@@ -46,11 +46,13 @@ namespace SolutionProjectChecker
             Console.WriteLine($"Create: {outputFileAllPackageReferences}");
             using (var writer = new StreamWriter(outputFileAllPackageReferences))
             {
-                writer.WriteLine("Project;Package Id;Package Version");
+                writer.WriteLine("Project;Package Id;Package Version;Multiple Package Versions Found");
                 foreach (var item in packageReferences)
                 {
-                    Console.WriteLine($"{item.ProjectFile}: {item.Package.Id} - {item.Package.Version}");
-                    writer.WriteLine($"{item.ProjectFile.Replace(rootFolder, ".")}; {item.Package.Id}; {item.Package.Version}");
+                    var multipleVersionsFound = packageReferences.Any(pr => pr.Package.Id == item.Package.Id && pr.Package.Version != item.Package.Version);
+
+                    Console.WriteLine($"{item.ProjectFile}: {item.Package.Id} - {item.Package.Version} - {multipleVersionsFound}");
+                    writer.WriteLine($"{item.ProjectFile.Replace(rootFolder, ".")}; {item.Package.Id}; {item.Package.Version}; {multipleVersionsFound}");
                 }
             }
 
@@ -64,13 +66,14 @@ namespace SolutionProjectChecker
                                               )
                                               .Distinct();
 
-                writer.WriteLine("Package Id;Package Version;Number of Occurrences");
+                writer.WriteLine("Package Id;Package Version;Number of Occurrences;Multiple Package Versions Found");
                 foreach (var item in uniquePackageReferences)
                 {
                     var package = item.Key;
+                    var multipleVersionsFound = packageReferences.Any(pr => pr.Package.Id == package.Id && pr.Package.Version != package.Version);
 
-                    Console.WriteLine($"{package.Id} - {package.Version} ({item.Count()})");
-                    writer.WriteLine($"{package.Id}; {package.Version}; {item.Count()}");
+                    Console.WriteLine($"{package.Id} - {package.Version} ({item.Count()} - {multipleVersionsFound})");
+                    writer.WriteLine($"{package.Id}; {package.Version}; {item.Count()}; {multipleVersionsFound}");
                 }
             }
         }
