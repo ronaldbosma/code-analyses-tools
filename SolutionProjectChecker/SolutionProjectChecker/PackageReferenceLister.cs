@@ -23,49 +23,17 @@ namespace SolutionProjectChecker
         {
             var csprojFiles = Directory.GetFiles(rootFolder, "*.csproj", SearchOption.AllDirectories);
             var vbprojFiles = Directory.GetFiles(rootFolder, "*.vbproj", SearchOption.AllDirectories);
-
             var projectFiles = csprojFiles.Union(vbprojFiles);
-            var packageReferences = new List<PackageReference>();
 
+            var packageReferences = new List<PackageReference>();
             foreach (var projFile in projectFiles)
             {
                 packageReferences.AddRange(GetPackageReferencesFromProjectFile(projFile));
                 packageReferences.AddRange(GetPackageReferencesFromPackagesConfig(projFile));
             }
 
-            Console.WriteLine($"Create: {outputFileAllPackageReferences}");
-            using (var writer = new StreamWriter(outputFileAllPackageReferences))
-            {
-                writer.WriteLine("Source;Package Id;Package Version;Multiple Package Versions Found");
-                foreach (var item in packageReferences)
-                {
-                    var multipleVersionsFound = packageReferences.Any(pr => pr.Package.Id == item.Package.Id && pr.Package.Version != item.Package.Version);
-
-                    Console.WriteLine($"{item.SourceFile}: {item.Package.Id} - {item.Package.Version} - {multipleVersionsFound}");
-                    writer.WriteLine($"{item.SourceFile.Replace(rootFolder, ".")}; {item.Package.Id}; {item.Package.Version}; {multipleVersionsFound}");
-                }
-            }
-
-            Console.WriteLine($"Create: {outputFileUniquePackageReferences}");
-            using (var writer = new StreamWriter(outputFileUniquePackageReferences))
-            {
-                var uniquePackageReferences = (from pr in packageReferences
-                                               group pr by pr.Package into package
-                                               orderby package.Key.Id, package.Key.Version
-                                               select package
-                                              )
-                                              .Distinct();
-
-                writer.WriteLine("Package Id;Package Version;Number of Occurrences;Multiple Package Versions Found");
-                foreach (var item in uniquePackageReferences)
-                {
-                    var package = item.Key;
-                    var multipleVersionsFound = packageReferences.Any(pr => pr.Package.Id == package.Id && pr.Package.Version != package.Version);
-
-                    Console.WriteLine($"{package.Id} - {package.Version} ({item.Count()} - {multipleVersionsFound})");
-                    writer.WriteLine($"{package.Id}; {package.Version}; {item.Count()}; {multipleVersionsFound}");
-                }
-            }
+            WriteAllPackageReferencesToCsv(packageReferences);
+            WriteAllUniquePackagesToCsv(packageReferences);
         }
 
         private static IEnumerable<PackageReference> GetPackageReferencesFromProjectFile(string projFile)
@@ -127,6 +95,46 @@ namespace SolutionProjectChecker
             }
             
             return packageReferences;
+        }
+
+        private static void WriteAllPackageReferencesToCsv(List<PackageReference> packageReferences)
+        {
+            Console.WriteLine($"Create: {outputFileAllPackageReferences}");
+            using (var writer = new StreamWriter(outputFileAllPackageReferences))
+            {
+                writer.WriteLine("Source;Package Id;Package Version;Multiple Package Versions Found");
+                foreach (var item in packageReferences)
+                {
+                    var multipleVersionsFound = packageReferences.Any(pr => pr.Package.Id == item.Package.Id && pr.Package.Version != item.Package.Version);
+
+                    Console.WriteLine($"{item.SourceFile}: {item.Package.Id} - {item.Package.Version} - {multipleVersionsFound}");
+                    writer.WriteLine($"{item.SourceFile.Replace(rootFolder, ".")}; {item.Package.Id}; {item.Package.Version}; {multipleVersionsFound}");
+                }
+            }
+        }
+
+        private static void WriteAllUniquePackagesToCsv(List<PackageReference> packageReferences)
+        {
+            Console.WriteLine($"Create: {outputFileUniquePackageReferences}");
+            using (var writer = new StreamWriter(outputFileUniquePackageReferences))
+            {
+                var uniquePackageReferences = (from pr in packageReferences
+                                               group pr by pr.Package into package
+                                               orderby package.Key.Id, package.Key.Version
+                                               select package
+                                              )
+                                              .Distinct();
+
+                writer.WriteLine("Package Id;Package Version;Number of Occurrences;Multiple Package Versions Found");
+                foreach (var item in uniquePackageReferences)
+                {
+                    var package = item.Key;
+                    var multipleVersionsFound = packageReferences.Any(pr => pr.Package.Id == package.Id && pr.Package.Version != package.Version);
+
+                    Console.WriteLine($"{package.Id} - {package.Version} ({item.Count()} - {multipleVersionsFound})");
+                    writer.WriteLine($"{package.Id}; {package.Version}; {item.Count()}; {multipleVersionsFound}");
+                }
+            }
         }
     }
 }
