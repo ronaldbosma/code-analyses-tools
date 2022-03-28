@@ -11,7 +11,7 @@ namespace SolutionProjectChecker
         {
             const string rootFolder = @"C:\repos\foo";
             const string solutionFile = @"C:\repos\foo\foo.sln";
-            Regex projectNamePattern = new Regex(@"[A-Za-z0-9_-]*\.(csproj|vbproj|sqlproj)");
+            Regex projectNamePattern = new Regex(@"[.A-Za-z0-9_-]*\.(csproj|vbproj|sqlproj)");
 
 
             var projectsInSolutionFile = new HashSet<string>();
