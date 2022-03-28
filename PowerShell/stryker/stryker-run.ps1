@@ -59,6 +59,9 @@ $projectReferenceRegex = "[A-Za-z0-9\.-]*.csproj"
 $testProjects = Get-ChildItem -Path $solutionFolder -Include $testProjectFilter -Recurse
 foreach ($testProject in $testProjects)
 {
+	$testProjectFolder = Split-Path $testProject.FullName
+	Push-Location $testProjectFolder
+		
 	# If a test project has more than one Project Reference, we need to specify which project to mutate.
 	# So we search for the project reference in the test project and loop over all of them.
 	$matchResults = Select-String -Path $testProject.FullName -Pattern $projectReferenceRegex -AllMatches
@@ -71,14 +74,16 @@ foreach ($testProject in $testProjects)
 			Write-Host "Test Project: $($testProject.Name)"
 			Write-Host "Project: $projectName"
 			
-			Write-Host "dotnet stryker --test-project $($testProject.FullName) --project $projectName --config-file $strykerConfigFile"
+			Write-Host "dotnet stryker --solution $solutionFilePath --test-project $($testProject.FullName) --project $projectName --config-file $strykerConfigFile"
 			
-			dotnet stryker --test-project $testProject.FullName --project $projectName --config-file $strykerConfigFile
+			dotnet stryker --solution $solutionFilePath --test-project $testProject.FullName --project $projectName --config-file $strykerConfigFile
 				
 			# Write-Host "Press enter to continue"
 			# Read-Host
 		}
 	}
+	
+	Pop-Location
 }
 
 Pop-Location
