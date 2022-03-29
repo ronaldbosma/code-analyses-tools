@@ -36,7 +36,7 @@
 		The test assembly filter used for selecting which tests to execute.
 
 	.EXAMPLE
-		.\perform-sonarqube-analysis-with-msbuild.ps1 "C:\temp\my-solution.sln" "http://localhost:9000" "*****"
+		.\sonarqube-perform-analysis-with-msbuild.ps1 "C:\temp\my-solution.sln" "http://localhost:9000" "*****"
 #>
 
 [cmdletbinding()]
