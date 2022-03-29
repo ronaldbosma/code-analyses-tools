@@ -30,19 +30,19 @@
 	
 	.PARAMETER msbuildExePath
 		Path to `msbuild.exe`. Used to build the solution.
-	
-	.PARAMETER vstestExePath
-		Path to `vstest.console.exe`. Used to test the solution.
-	
-	.PARAMETER codeCoverageExePath
-		Path to `CodeCoverage.exe`. Used to measure code coverage.
-
-	.PARAMETER testAssemblyFilter
-		The test assembly filter used for selecting which tests to execute.
 
 	.PARAMETER msbuildPlatform
 		The platform to use when building the solution with msbuild.
 		Default is "Any CPU". Other example is "x64".
+	
+	.PARAMETER vstestExePath
+		Path to `vstest.console.exe`. Used to test the solution.
+
+	.PARAMETER testAssemblyFilter
+		The test assembly filter used for selecting which tests to execute.
+	
+	.PARAMETER codeCoverageExePath
+		Path to `CodeCoverage.exe`. Used to convert the code coverage files to a format SonarQube understands.
 
 	.EXAMPLE
 		.\sonarqube-perform-analysis-with-msbuild-classic.ps1 "C:\temp\my-solution.sln" "http://localhost:9000" "*****"
@@ -76,9 +76,6 @@ $solutionFileName = Split-Path $solutionFilePath -Leaf
 $solutionFolder = Split-Path $solutionFilePath
 $solutionName = [io.path]::GetFileNameWithoutExtension($solutionFilePath)
 
-$codeCoverageFile = Join-Path $solutionFolder "code.coverage"
-$codeCoverageXmlFile = Join-Path $solutionFolder "code.coveragexml"
-
 Write-Host "Variables:"
 Write-Host "- Solution: $solutionFileName"
 Write-Host "- Project: $solutionName"
@@ -93,21 +90,26 @@ nuget.exe restore
 
 
 Write-Host "Start analysis"
-& $sonarScannerPath begin /k:$solutionName /d:sonar.login=$token /d:sonar.cs.vscoveragexml.reportsPaths=$codeCoverageXmlFile
+& $sonarScannerPath begin /k:$solutionName /d:sonar.login=$token `
+	/d:sonar.cs.vstest.reportsPaths=".\TestResults\*.trx" `
+	/d:sonar.cs.vscoveragexml.reportsPaths=".\TestResults\**\*.coveragexml"
 
 
 Write-Host "Build solution"
 & $msbuildExePath $solutionFileName /t:Rebuild /p:Platform=$msbuildPlatform
 
 
-#Write-Host "Run tests"
-#& $vstestExePath $testAssemblyFilter /collect:"Code Coverage"
+Write-Host "Run tests"
+if (Test-Path .\TestResults) { Remove-Item .\TestResults -Recurse -Confirm:$false } # Remove old test results
+& $vstestExePath $testAssemblyFilter /logger:trx /collect:"Code Coverage"
 
 
-Write-Host "Measure code coverage"
-& $codeCoverageExePath collect /output:$codeCoverageFile $vstestExePath $testAssemblyFilter
-# Convert the .coverage file to an XML format that SonarQube understands
-& $codeCoverageExePath analyze /output:$codeCoverageXmlFile $codeCoverageFile
+Write-Host "Convert coverage files"
+$coverageFiles = Get-ChildItem -Recurse "./TestResults/**/*.coverage"
+foreach ($coverageFile in $coverageFiles)
+{
+	& $codeCoverageExePath analyze /output:"$($coverageFile)xml" $coverageFile
+}
 
 
 Write-Host "Finish analysis"
