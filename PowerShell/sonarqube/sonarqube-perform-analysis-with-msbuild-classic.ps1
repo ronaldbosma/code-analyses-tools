@@ -56,10 +56,10 @@ param
 	$token,
 	$sonarScannerPath = "C:\Temp\sonar-scanners\sonar-scanner-msbuild-5.5.3.43281-net46\SonarScanner.MSBuild.exe",
 	$msbuildExePath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\amd64\MSBuild.exe",
+	$msbuildPlatform = "Any CPU",
 	$vstestExePath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe",
-	$codeCoverageExePath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe",
 	$testAssemblyFilter = "**\bin\Debug\**\*Tests.dll",
-	$msbuildPlatform = "Any CPU"
+	$codeCoverageExePath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe"
 )
 
 Write-Verbose "Parameters:"
