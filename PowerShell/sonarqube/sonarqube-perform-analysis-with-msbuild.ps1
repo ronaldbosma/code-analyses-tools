@@ -4,6 +4,8 @@
 		
 	.DESCRIPTION
         Performs an analysis of a solution with SonarQube. Uses  `msbuild.exe` and `vstest.console.exe`.
+		NOTE: in this case the Sonar Scanner is a dll that can be used by the `dotnet` command.
+
 		It will:
 			- step into the solution folder
 			- restore NuGet packages
