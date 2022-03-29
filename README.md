@@ -26,6 +26,7 @@ Has features
    - Will look for `PackageReference` elements in a `(*.csproj|*.vbproj)` file. Can handle package references with the version as an attribute and as an element.
    - Will look for packages in `package.config` files that are in the same folder as a `(*.csproj|*.vbproj)`
    - Will also list all unique combinations of package id and version in a separate CSV.
+   - Will also list all unique package ids in a separate CSV.
 
 ## StrykerReportMerger
 

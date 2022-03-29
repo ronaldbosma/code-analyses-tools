@@ -4,13 +4,15 @@ namespace SolutionProjectChecker
 {
     /// <summary>
     /// Class to extract the package references per project file and packages.config, and write results to CSV.
-    /// Will also list all unique combinations of package id and version in a separate CSV.
+    /// - Will also list all unique combinations of package id and version in a separate CSV.
+    /// - Will also list all unique package ids in a separate CSV.
     /// </summary>
     internal class PackageReferenceLister
     {
         private const string rootFolder = @"C:\repos\foo";
         private const string outputFileAllPackageReferences = @$"{rootFolder}\package-references-all.csv";
-        private const string outputFileUniquePackageReferences = @$"{rootFolder}\package-references-unique.csv";
+        private const string outputFilePackageReferencesUniquePerVersion = @$"{rootFolder}\package-references-unique-per-version.csv";
+        private const string outputFilePackageReferencesUniquePerId = @$"{rootFolder}\package-references-unique-per-id.csv";
 
         // Patterns in *.csproj
         private static readonly Regex packageReferencePattern1 = new (@"<PackageReference Include=""([A-Za-z0-9\.-]+)"" Version=""([A-Za-z0-9\.-]+)"" />");
@@ -37,7 +39,8 @@ namespace SolutionProjectChecker
             }
 
             WriteAllPackageReferencesToCsv(packageReferences);
-            WriteAllUniquePackagesToCsv(packageReferences);
+            WriteAllUniquePackageVersionsToCsv(packageReferences);
+            WriteAllUniquePackageIdsToCsv(packageReferences);
         }
 
         private static IEnumerable<PackageReference> GetPackageReferencesFromProjectFile(string projFile)
@@ -127,10 +130,10 @@ namespace SolutionProjectChecker
             }
         }
 
-        private static void WriteAllUniquePackagesToCsv(List<PackageReference> packageReferences)
+        private static void WriteAllUniquePackageVersionsToCsv(List<PackageReference> packageReferences)
         {
-            Console.WriteLine($"Create: {outputFileUniquePackageReferences}");
-            using (var writer = new StreamWriter(outputFileUniquePackageReferences))
+            Console.WriteLine($"Create: {outputFilePackageReferencesUniquePerVersion}");
+            using (var writer = new StreamWriter(outputFilePackageReferencesUniquePerVersion))
             {
                 var uniquePackageReferences = (from pr in packageReferences
                                                group pr by pr.Package into package
@@ -147,6 +150,31 @@ namespace SolutionProjectChecker
 
                     Console.WriteLine($"{package.Id} - {package.Version} ({item.Count()} - {multipleVersionsFound})");
                     writer.WriteLine($"{package.Id}; {package.Version}; {item.Count()}; {multipleVersionsFound}");
+                }
+            }
+        }
+
+        private static void WriteAllUniquePackageIdsToCsv(List<PackageReference> packageReferences)
+        {
+            Console.WriteLine($"Create: {outputFilePackageReferencesUniquePerId}");
+            using (var writer = new StreamWriter(outputFilePackageReferencesUniquePerId))
+            {
+                var uniquePackageReferences = (from pr in packageReferences
+                                               group pr by pr.Package into package
+                                               select package
+                                              )
+                                              .Distinct();
+                var uniquePackageIds = uniquePackageReferences.Select(p => p.Key.Id).Distinct().OrderBy(id => id).ToArray();
+
+                writer.WriteLine("Package Id;Number of Occurrences;Number of Different Versions;Multiple Package Versions Found");
+                foreach (var packageId in uniquePackageIds)
+                {
+                    var numberOfOccurences = packageReferences.Where(pr => pr.Package.Id == packageId).Count();
+                    var numberOfDifferentVersions = uniquePackageReferences.Where(pr => pr.Key.Id == packageId).Count();
+                    var multipleVersionsFound = numberOfDifferentVersions > 1;
+
+                    Console.WriteLine($"{packageId} ({numberOfOccurences} - {numberOfDifferentVersions} - {multipleVersionsFound})");
+                    writer.WriteLine($"{packageId}; {numberOfOccurences}; {numberOfDifferentVersions}; {multipleVersionsFound}");
                 }
             }
         }
