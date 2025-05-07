@@ -17,6 +17,7 @@ namespace SolutionProjectChecker
         // Patterns in *.csproj
         private static readonly Regex packageReferencePattern1 = new (@"<PackageReference Include=""([A-Za-z0-9\.-]+)"" Version=""([A-Za-z0-9\.-]+)"" />");
         private static readonly Regex packageReferencePattern2 = new(@"<PackageReference Include=""([A-Za-z0-9\.-]+)"">[ \n\r]*<Version>([A-Za-z0-9\.-]+)</Version>[ \n\r]*</PackageReference>");
+        private static readonly Regex packageReferencePattern3 = new(@"<PackageVersion Include=""([A-Za-z0-9\.-]+)"" Version=""([A-Za-z0-9\.-]+)"" />");
 
         // Patterns in packages.config
         private static readonly Regex packagesConfigIdPattern = new (@"id=""([A-Za-z0-9\.-]+)""");
@@ -29,7 +30,8 @@ namespace SolutionProjectChecker
         {
             var csprojFiles = Directory.GetFiles(rootFolder, "*.csproj", SearchOption.AllDirectories);
             var vbprojFiles = Directory.GetFiles(rootFolder, "*.vbproj", SearchOption.AllDirectories);
-            var projectFiles = csprojFiles.Union(vbprojFiles);
+            var directoryPackagePropFiles = Directory.GetFiles(rootFolder, "Directory.Packages.props", SearchOption.AllDirectories);
+            var projectFiles = csprojFiles.Union(vbprojFiles).Union(directoryPackagePropFiles);
 
             var packageReferences = new List<PackageReference>();
             foreach (var projFile in projectFiles)
@@ -52,6 +54,7 @@ namespace SolutionProjectChecker
                 var content = reader.ReadToEnd();
                 packageReferences.AddRange(GetPackageReferencesUsingRegex(projFile, content, packageReferencePattern1));
                 packageReferences.AddRange(GetPackageReferencesUsingRegex(projFile, content, packageReferencePattern2));
+                packageReferences.AddRange(GetPackageReferencesUsingRegex(projFile, content, packageReferencePattern3));
             }
 
             return packageReferences;
